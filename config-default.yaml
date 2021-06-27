@@ -1,12 +1,12 @@
 epochs:
   desc: Number of epochs to train over
-  value: 100
+  value: 20
 batch_size:
   desc: Size of each mini-batch
-  value: 32
+  value: 8
  Modle_name:
   desc: which model is being run
-  value: Kid-specific model
+  value: Adult-specific model
  LR_start rate:
   desc: We use LR decay that starts with this value
   value:
