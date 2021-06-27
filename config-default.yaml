@@ -9,4 +9,4 @@ batch_size:
   value: Adult-specific model
  LR_start rate:
   desc: We use LR decay that starts with this value
-  value:
+  value:0.01
