@@ -105,12 +105,12 @@ class MyDataset(Dataset):
                     difference = 75 - len(frames)
                     frames.extend(frames[-difference:])
 
-                    frames = frames[:75]
+            frames = frames[:75]
             
             video = np.stack(frames)
             np.save(path_pt,video)
         
-        
+
         video = np.load(path_pt)
         video = self.video_transform(video,self.end_size)
 
