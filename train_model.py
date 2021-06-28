@@ -15,10 +15,10 @@ import seaborn as sns
 from torchvision import transforms, datasets, models
 import torch
 from torch import optim, cuda
-from torch.utils.data import DataLoader, sampler
+from torch.utils.data import DataLoader, dataloader, sampler
 import torch.nn as nn
 from torch.optim import lr_scheduler
-
+import wandb
 import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 
@@ -40,7 +40,7 @@ import matplotlib.pyplot as plt
 plt.rcParams['font.size'] = 14
 
 #custom class
-from dataset_ours import MyDataset
+from dataset import MyDataset
 from slowfastnet import SlowFast,Bottleneck
 from TrainTestCode import train
 
@@ -68,6 +68,10 @@ class MLP(nn.Module):
                 x = self.nonlin(residual+layer(x))
         x = self.out_layer(x)
         return x
+
+wandb.init(project="kids_model",config='config-default.yaml')
+config = wandb.config
+age = config['age']
 # Printing out all outputs
 InteractiveShell.ast_node_interactivity = 'all'
 
@@ -76,8 +80,8 @@ InteractiveShell.ast_node_interactivity = 'all'
 
 # %%
 batch_size = 32
-save_models = "Kid-specificModel.pt"
-checkpoint_path = "Kid-specificModel.pth" #saving model
+save_models = "model_save/'model_save/checkpoint_{wandb.run.name}_{age}.pt'"
+# checkpoint_path = "Kid-specificModel.pth" #saving model
 n_classes = 21
 # Whether to train on a gpu
 
@@ -87,23 +91,17 @@ print(f'Device: {device}')
 # Number of gpus
 # %% [markdown]
 # # Create Data Loader for training and test split
-age ='adults'
-# %%
-dataset_train_kids = MyDataset(f'Data_Csv/TrainSplit-{age}.csv',f'className_{age}Train.json',mode='train')
-dataset_val_kids = MyDataset(f'Data_Csv/ValSplit-{age}.csv',f'className_{age}sVal.json',mode='train')
-dataset_test_kids = MyDataset(f'Data_Csv/TestSplit-{age}.csv',f'className_{age}Test.json',mode='train')
-dataLoader_kids = {
-    'train':DataLoader(dataset_train_kids,batch_size= batch_size,shuffle=True),
-    'test': DataLoader(dataset_test_kids,batch_size= batch_size,shuffle=True),
-    'val':DataLoader(dataset_val_kids,batch_size= batch_size,shuffle=True)
-}
-    
-#Loader for adult test split because we evaluate model on it as well
 
-dataset_test_adult = MyDataset('Data_Csv/TestSplit-adults.csv','className_AdultsVal.json',mode='val')
-test_dataloader_adult = DataLoader(dataset_test_adult,batch_size= batch_size,shuffle=True)
-    
-    
+# %%
+dataset_train = MyDataset(f'data/Data_Csv/TrainSplit-{age}.csv',f'className_{age}Train.json',mode='train')
+dataset_val = MyDataset(f'data/Data_Csv/ValSplit-{age}.csv',f'className_{age}sVal.json',mode='val')
+dataset_test = MyDataset(f'data/Data_Csv/TestSplit-{age}.csv',f'className_{age}Test.json',mode='test')
+dataLoader = {
+    'train':DataLoader(dataset_train,batch_size= batch_size,shuffle=True),
+    'test': DataLoader(dataset_test,batch_size= batch_size,shuffle=True),
+    'val':DataLoader(dataset_val,batch_size= batch_size,shuffle=True)
+}
+
 
 # %% [markdown]
 # # Load Model and freeze previous layers
@@ -112,7 +110,7 @@ test_dataloader_adult = DataLoader(dataset_test_adult,batch_size= batch_size,shu
 model = SlowFast(Bottleneck, [3, 4, 6, 3],num_classes=200)
 
 
-state_dict = torch.load('slowfast50_best_fixed.pth',map_location=device)#remove map_location on Gpu
+state_dict = torch.load('pretrained_models/slowfast50_best_fixed.pth',map_location=device)#remove map_location on Gpu
 
 model.load_state_dict(state_dict)
 
@@ -132,63 +130,34 @@ model = model.to(device)
 
 # %%
 criterion = nn.CrossEntropyLoss()
-optimizer_ft = optim.Adam(model.fc.parameters(), lr=0.001)
+optimizer_ft = optim.Adam(model.fc.parameters(), lr=config['lr'])
 # Decay LR if plateau
-exp_lr_scheduler = lr_scheduler.ReduceLROnPlateau(optimizer_ft, patience=40, factor=0.5,threshold=0.01)
+exp_lr_scheduler = lr_scheduler.ReduceLROnPlateau(optimizer_ft, patience=config['patience'], factor=0.5,threshold=0.01)
 
 # %% [markdown]
 # # Train Model
 
+
+
+
 # %%
-model, history = train(
+model, history = train(config,
     model,
     criterion,
     optimizer_ft,
-    dataLoader_kids['train'],
-    dataLoader_kids['val'],
+    dataLoader['train'],
+    dataLoader['val'],
     exp_lr_scheduler,
     save_models,device = device)
 
-# %% [markdown]
-# # INSPECT TRAINING PROGRESS
-# create accuracy and loss plots
 
-# %%
-plt.figure(figsize=(8, 6))
-for c in ['train_loss', 'valid_loss']:
-    plt.plot(
-        history[c], label=c)
-plt.legend()
-plt.xlabel('Epoch')
-plt.ylabel('Average Cross entropy loss')
-plt.title('Training and Validation Losses')
+torch.save(model.state_dict(),f'model_save/{wandb.run.name}_{age}.pt' )
 
-
-# %%
-plt.figure(figsize=(8, 6))
-for c in ['train_acc', 'valid_acc']:
-    plt.plot(
-        100 * history[c], label=c)
-plt.legend()
-plt.xlabel('Epoch')
-plt.ylabel('Average Accuracy')
-plt.title('Training and Validation Accuracy')
-
-# %% [markdown]
-# # Saving the fine-tuned kid-specific model
-
-# %%
-torch.save(model.state_dict(), checkpoint_path)
-
-# %% [markdown]
-# # Get top-1 and top5 accuracy
-
-# %%
 def accuracy(output, target, topk=(1, )):
     """Compute the topk accuracy(s)"""
-    if train_on_gpu:
-        output = output.to('cuda')
-        target = target.to('cuda')
+    
+    output = output.to(device)
+    target = target.to(device)
 
     with torch.no_grad():
         maxk = max(topk)
@@ -212,27 +181,25 @@ def accuracy(output, target, topk=(1, )):
 
 # %%
 #get top-1 and top-5 for kids-test data (do for validation and test combined and then only test)
-testiter = iter(dataLoader_kids['test'])
+testiter = iter(dataLoader['test'])
 
 # Get a batch of testing images and labels
 features, targets = next(testiter)
 print("Top 1 and Top 5 Kids test split")
-if train_on_gpu:
-    accuracy(model(features.to('cuda')), targets, topk=(1, 5))
-else:
-    accuracy(model(features), targets, topk=(1, 5))
+
+accuracy(model(features.to(device)), targets, topk=(1, 5))
+
 
 
 # %%
 #get top-1 and top-5 for adults-test data
-testiter = iter(test_dataloader_adult)
+testiter = iter(dataloader['test'])
 # Get a batch of testing images and labels
 features, targets = next(testiter)
 print("Top 1 and Top 5 Adult test split")
-if train_on_gpu:
-    accuracy(model(features.to('cuda')), targets, topk=(1, 5))
-else:
-    accuracy(model(features), targets, topk=(1, 5))
+
+accuracy(model(features.to(device)), targets, topk=(1, 5))
+
 
 # %% [markdown]
 # # Calculate the Accuracy per Class
@@ -267,8 +234,8 @@ def evaluate(model, test_loader, criterion, topk=(1, 5)):
         for data, targets in test_loader:
 
             # Tensors to gpu
-            if train_on_gpu:
-                data, targets = data.to('cuda'), targets.to('cuda')
+         
+            data, targets = data.to(device), targets.to(device)
 
             # Raw model output
             out = model(data)
@@ -294,7 +261,7 @@ def evaluate(model, test_loader, criterion, topk=(1, 5)):
     return results.reset_index().rename(columns={'index': 'class'})
 
 # %%
-results = evaluate(model, dataLoader_kids['test'], criterion)
+results = evaluate(model, dataLoader['test'], criterion)
 results
 
 
@@ -366,10 +333,9 @@ def predict(image_path, model, topk=5):
     img_tensor = process_image(image_path)
 
     # Resize
-    if train_on_gpu:
-        img_tensor = img_tensor.view(1, 3, 224, 224).cuda()
-    else:
-        img_tensor = img_tensor.view(1, 3, 224, 224)
+  
+    img_tensor = img_tensor.view(1, 3, 224, 224).to(device)
+    
 
     # Set to evaluation
     with torch.no_grad():
