@@ -75,7 +75,7 @@ InteractiveShell.ast_node_interactivity = 'all'
 # # SET UP TARAINING PARAMS (GPU OR CPU)
 
 # %%
-batch_size = 8
+batch_size = 32
 save_models = "Kid-specificModel.pt"
 checkpoint_path = "Kid-specificModel.pth" #saving model
 n_classes = 21
@@ -134,7 +134,7 @@ model = model.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer_ft = optim.Adam(model.fc.parameters(), lr=0.001)
 # Decay LR if plateau
-exp_lr_scheduler = lr_scheduler.ReduceLROnPlateau(optimizer_ft, patience=1, factor=0.1,threshold=0.01)
+exp_lr_scheduler = lr_scheduler.ReduceLROnPlateau(optimizer_ft, patience=40, factor=0.5,threshold=0.01)
 
 # %% [markdown]
 # # Train Model
