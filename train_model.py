@@ -80,7 +80,7 @@ InteractiveShell.ast_node_interactivity = 'all'
 
 # %%
 batch_size = 32
-save_models = "model_save/'model_save/checkpoint_{wandb.run.name}_{age}.pt'"
+save_models = f"model_save/checkpoint_{wandb.run.name}_{age}.pt"
 # checkpoint_path = "Kid-specificModel.pth" #saving model
 n_classes = 21
 # Whether to train on a gpu
