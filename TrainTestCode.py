@@ -134,7 +134,8 @@ def train(model,
 
             # Update the parameters
             optimizer.step()
-            scheduler.step(loss)
+            #scheduler.step(loss)
+            
             # Track train loss by multiplying average loss by number of examples in batch
             train_loss += loss.item() * data.size(0)
 
@@ -143,6 +144,7 @@ def train(model,
             
             # Need to convert correct tensor from int to float to average
             accuracy = (target == pred).sum()/target.shape[0]
+            wandb.log({'batch_accuracy':accuracy.item()*100})
             # Multiply average accuracy times the number of examples in batch
             train_acc += accuracy.item()
             

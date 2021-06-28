@@ -22,7 +22,7 @@ class MyDataset(Dataset):
         val_interval=2,
         input_frame = 64,
         mean=[0.485, 0.456, 0.406],
-        std=[0.229, 0.224, 0.225],mode='train',end_size=[None,224,224]):
+        std=[0.229, 0.224, 0.225],mode='train',end_size=[None,256,256]):
 
         self.end_size = end_size
         self.dataset_path = dataset_path
@@ -70,7 +70,7 @@ class MyDataset(Dataset):
                                         transforms=iaa.Sequential([
                                             iaa.Resize({"shorter-side": 294, "longer-side":"keep-aspect-ratio"}),
                                             iaa.CropToFixedSize(width=294, height=294, position='center'),
-                                            iaa.CropToFixedSize(width=256, height=256, position='center')
+                                            iaa.CropToFixedSize(width=clip_size, height=clip_size, position='center')
                                         ]),
                                         normalise=[mean,std])
 
@@ -96,12 +96,12 @@ class MyDataset(Dataset):
         for i, im in enumerate(vid):
             frames.append(im)
         pass
-        frames = frames[::2] 
-        if len(frames) < 75:
-            difference = 75 - len(frames) 
+        frames = frames[::9]
+        if len(frames) < 16:
+            difference = 16 - len(frames) 
             frames.extend(frames[-difference:])
 
-        frames = frames[:75]
+        frames = frames[:16]
         
         video = np.stack(frames)
         

@@ -1,0 +1,6 @@
+wandb/
+train_log/
+data/
+.vscode/
+.idea/
+model_save/
