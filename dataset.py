@@ -8,7 +8,7 @@ import video_transforms as transforms
 import cv2
 import imageio
 import json
-
+import skvideo.io
 
 
 
@@ -38,7 +38,7 @@ class MyDataset(Dataset):
 
         sometimes_aug = lambda aug: iaa.Sometimes(0.4, aug)
         sometimes_seq = lambda aug: iaa.Sometimes(0.9, aug)
-        
+
 
         if mode == 'train':
             self.video_transform = transforms.Compose(
@@ -70,31 +70,48 @@ class MyDataset(Dataset):
                                         transforms=iaa.Sequential([
                                             iaa.Resize({"shorter-side": 294, "longer-side":"keep-aspect-ratio"}),
                                             iaa.CropToFixedSize(width=294, height=294, position='center'),
-                                            iaa.CropToFixedSize(width=256, height=256, position='center')
+                                            iaa.CropToFixedSize(width=clip_size, height=clip_size, position='center')
                                         ]),
-                                        normalise=[mean,std]) 
+                                        normalise=[mean,std])
 
 
     def __len__(self):
         return self.df.shape[0]
-    
+
 
     def __getitem__(self,index):
         row = self.df.iloc[index]
         label = row['Action Label']
         label = self.class_to_idx[label] # Convert it to int
-        vid = imageio.get_reader(row['Video Path'],  'ffmpeg')
-        frame_count = vid.count_frames()
-        fps =  vid.get_meta_data()['fps']
-        time = frame_count/fps
-        frames = []
+        # path = row['Video Path'].split("/")
+        # path =path[1]+"/"+path[2]+"/"+path[3]  #dont panic, i'll clean this up by creating new file where row is Kinetic-kids-Processed/
+        # print("path is: ",path)
 
-        for i, im in enumerate(vid):
-            frames.append(im)
-        pass
-        frames = frames[0:self.input_frame] #number of frames we feed the model
-        video = np.stack(frames)
-        #ADD INTERPOLATION
+        path = os.path.join('data/',row['Video Path'])
+        path_pt = path.split('.')[0] +'.npy'
+
+        if not os.path.isfile(path_pt):
+            vid = skvideo.io.vread(path)
+        
+            # frame_count = vid.count_frames()
+            #fps =  vid.get_meta_data()['fps']
+            # time = frame_count/fps
+            frames = []
+            for i, im in enumerate(vid):
+                frames.append(im)
+            pass
+            frames = frames[::2]
+            if len(frames) < 75:
+                    difference = 75 - len(frames)
+                    frames.extend(frames[-difference:])
+
+                    frames = frames[:75]
+            
+            video = np.stack(frames)
+            np.save(path_pt,video)
+        
+        
+        video = np.load(path_pt)
         video = self.video_transform(video,self.end_size)
 
 

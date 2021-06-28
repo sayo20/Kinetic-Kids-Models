@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 plt.rcParams['font.size'] = 14
 
 #custom class
-from dataset_ours import MyDataset
+from dataset import MyDataset
 from slowfastnet import SlowFast,Bottleneck
 
 # Printing out all outputs
@@ -57,7 +57,7 @@ def accuracy(output, target,device, topk=(1, )):
             res.append(correct_k.mul_(100.0 / batch_size).item())
         return res
 
-def train(model,
+def train(config,model,
           criterion,
           optimizer,
           train_loader,
@@ -102,7 +102,7 @@ def train(model,
         print(f'Starting Training from Scratch.\n')
 
     overall_start = timer()
-    wandb.init(project="kids_model")
+    
     # Main loop
     for epoch in range(n_epochs):
 
@@ -134,7 +134,7 @@ def train(model,
 
             # Update the parameters
             optimizer.step()
-            #scheduler.step(loss)
+            scheduler.step(loss)
             
             # Track train loss by multiplying average loss by number of examples in batch
             train_loss += loss.item() * data.size(0)

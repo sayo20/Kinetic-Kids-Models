@@ -4,3 +4,4 @@ data/
 .vscode/
 .idea/
 model_save/
+pretrained_models/
