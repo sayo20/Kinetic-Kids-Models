@@ -90,26 +90,16 @@ if not config['checkpoint_path']:
     state_dict = torch.load('pretrained_models/slowfast50_best_fixed.pth',map_location=device)#remove map_location on Gpu
     model.load_state_dict(state_dict)
     model.fc =  nn.Linear(num_ftrs, 21)
-    for param in model.parameters():
-        param.requires_grad = False #freeze the earlier layers
-
 else:
     print("Loading from checkpoint: " + config['checkpoint_path'])
     state_dict = torch.load(config['checkpoint_path'],map_location=device)#remove map_location on Gpu
     model.fc =  nn.Linear(num_ftrs, 21)
     model.load_state_dict(state_dict)
-    for param in model.parameters():
-        param.requires_grad = False #freeze all layers
-    for param in model.fc.parameters(): # Unfreeze head
-        param.requires_grad = True
+for param in model.parameters():
+    param.requires_grad = False #freeze all layers
+for param in model.fc.parameters(): # Unfreeze head
+    param.requires_grad = True
     
-    
-
-
-
-
-#model.fc = MLP(num_ftrs,[512,512,512],21,nn.GELU())
-
 
 model = model.to(device)
 
