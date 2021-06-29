@@ -108,17 +108,30 @@ dataLoader = {
 
 # %%
 model = SlowFast(Bottleneck, [3, 4, 6, 3],num_classes=200)
-
-
-state_dict = torch.load('pretrained_models/slowfast50_best_fixed.pth',map_location=device)#remove map_location on Gpu
-
-model.load_state_dict(state_dict)
-
-for param in model.parameters():
-    param.requires_grad = False #freeze the earlier layers
-
 num_ftrs = model.fc.in_features #we initialize the model with previous weights and only finetune the last last year
-model.fc =  nn.Linear(num_ftrs, 21)
+if not config['checkpoint_path']:
+    print(f'Loading original pretrained weights with new head')
+    state_dict = torch.load('pretrained_models/slowfast50_best_fixed.pth',map_location=device)#remove map_location on Gpu
+    model.load_state_dict(state_dict)
+    model.fc =  nn.Linear(num_ftrs, 21)
+    for param in model.parameters():
+        param.requires_grad = False #freeze the earlier layers
+
+else:
+    print("Loading from checkpoint: " + config['checkpoint_path'])
+    state_dict = torch.load(config['checkpoint_path'],map_location=device)#remove map_location on Gpu
+    model.fc =  nn.Linear(num_ftrs, 21)
+    model.load_state_dict(state_dict)
+    for param in model.parameters():
+        param.requires_grad = False #freeze all layers
+    for param in model.fc.parameters(): # Unfreeze head
+        param.requires_grad = True
+    
+    
+
+
+
+
 #model.fc = MLP(num_ftrs,[512,512,512],21,nn.GELU())
 
 
@@ -174,7 +187,7 @@ def accuracy(output, target, topk=(1, )):
 
         # For each k, find the percentage of correct
         for k in topk:
-            correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
+            correct_k = correct[:k].reshape(-1).float().sum(0, keepdim=True)
             res.append(correct_k.mul_(100.0 / batch_size).item())
         return res
 
