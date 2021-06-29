@@ -6,10 +6,13 @@ batch_size:
   value: 32
 lr:
   desc: We use LR decay that starts with this value
-  value: 0.01
+  value: 0.001 # Had used 0.01 as scratch
 patience:
   desc: Patience for scheduler
   value: 100
 age:
   desc: adult or kids
   value: 'adults'
+checkpoint_path:
+  desc: Path to model checkpoint, if false train from scratch
+  value: model_save\curious-firefly-53_adults.pt
