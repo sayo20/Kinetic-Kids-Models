@@ -44,30 +44,6 @@ from dataset import MyDataset
 from slowfastnet import SlowFast,Bottleneck
 from TrainTestCode import train
 
-class MLP(nn.Module):
-    def __init__(self,in_dim,sizes,out_dim,nonlin,residual=True):
-        super().__init__()
-        self.in_dim = in_dim
-        self.sizes = sizes
-        self.out_dim = out_dim
-        self.nonlin = nonlin
-        self.residual = residual
-        self.in_layer = nn.Linear(in_dim,self.sizes[0])
-        self.out_layer = nn.Linear(self.sizes[-1],out_dim)
-        self.layers = nn.ModuleList([nn.Linear(sizes[index],sizes[index+1]) for index in range(len(sizes)-1)])
-
-
-    def forward(self,x):
-        x = self.nonlin(self.in_layer(x))
-
-        for index, layer in enumerate(self.layers):
-            if ((index % 2) == 0):
-                residual = x
-                x = self.nonlin(layer(x))
-            else:
-                x = self.nonlin(residual+layer(x))
-        x = self.out_layer(x)
-        return x
 
 wandb.init(project="kids_model",config='config-default.yaml')
 config = wandb.config
@@ -161,7 +137,7 @@ model, history = train(config,
     dataLoader['train'],
     dataLoader['val'],
     exp_lr_scheduler,
-    save_models,device = device)
+    save_models,device = device,max_epochs_stop=config['max_epochs_stop'])
 
 
 torch.save(model.state_dict(),f'model_save/{wandb.run.name}_{age}.pt' )
@@ -206,7 +182,7 @@ accuracy(model(features.to(device)), targets, topk=(1, 5))
 
 # %%
 #get top-1 and top-5 for adults-test data
-testiter = iter(dataloader['test'])
+testiter = iter(dataLoader['test'])
 # Get a batch of testing images and labels
 features, targets = next(testiter)
 print("Top 1 and Top 5 Adult test split")
@@ -431,6 +407,6 @@ def display_category(model, category, n=4):
 
 # %%
 #check the results with minimum accuracy
-display_category(model, 'anchor')
+#display_category(model, 'anchor')
 
 

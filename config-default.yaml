@@ -1,18 +1,22 @@
 epochs:
   desc: Number of epochs to train over
-  value: 20
+  value: 50
 batch_size:
   desc: Size of each mini-batch
   value: 32
 lr:
   desc: We use LR decay that starts with this value
-  value: 0.001 # Had used 0.01 as scratch
+  value: 0.01 # Had used 0.01 as scratch
 patience:
   desc: Patience for scheduler
-  value: 100
+  value: 80
 age:
   desc: adult or kids
   value: 'adults'
 checkpoint_path:
   desc: Path to model checkpoint, if false train from scratch
-  value: model_save\curious-firefly-53_adults.pt
+  value: False
+max_epochs_stop:
+  desc: How many epochs no improvement before early stop
+  value: 10
+
