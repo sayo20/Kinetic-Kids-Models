@@ -94,12 +94,7 @@ def train(config,model,
     valid_max_acc = 0
     history = []
 
-    # Number of epochs already trained (if using loaded in model weights)
-    try:
-        print(f'Model has been trained for: {model.epochs} epochs.\n')
-    except:
-        model.epochs = 0
-        print(f'Starting Training from Scratch.\n')
+    
 
     overall_start = timer()
     
