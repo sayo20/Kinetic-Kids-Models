@@ -28,9 +28,32 @@ from slowfastnet import SlowFast,Bottleneck
 # Printing out all outputs
 InteractiveShell.ast_node_interactivity = 'all'
 
+def mapIntToClass(prediction,classjson):
+    class_dict = getClassDict(classjson)
+    keys_labels = list(class_dict.keys())
+    values_int = list(class_dict.values())
+    position = values_int.index(prediction)
+    label = keys_labels[position]
 
+    return label
 
-
+def check_accuracy(loader, model):
+    num_correct = 0
+    num_samples = 0
+    model.eval()
+    
+    with torch.no_grad():
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+            
+            scores = model(x)
+            _, predictions = scores.max(1)
+            num_correct += (predictions == y).sum()
+            num_samples += predictions.size(0)
+        
+        print(f'Got {num_correct} / {num_samples} with accuracy {float(num_correct)/float(num_samples)*100:.2f}') 
+    
 
 def accuracy(output, target,device, topk=(1, )):
     """Compute the topk accuracy(s)"""
