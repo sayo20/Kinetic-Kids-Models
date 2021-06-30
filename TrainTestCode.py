@@ -94,7 +94,7 @@ def train(config,model,
     valid_max_acc = 0
     history = []
 
-    
+
 
     overall_start = timer()
     
@@ -151,7 +151,7 @@ def train(config,model,
         
         # After training loops ends, start validation
         # else:
-        model.epochs += 1
+        
 
         # Don't need to keep track of gradients
         with torch.no_grad():

@@ -6,7 +6,7 @@ batch_size:
   value: 32
 lr:
   desc: We use LR decay that starts with this value
-  value: 0.01 # Had used 0.01 as scratch
+  value: 0.001 # Had used 0.01 as scratch
 patience:
   desc: Patience for scheduler
   value: 80
@@ -15,7 +15,7 @@ age:
   value: 'adults'
 checkpoint_path:
   desc: Path to model checkpoint, if false train from scratch
-  value: False
+  value: 'model_save\usual-vortex-59_adults.pt'
 max_epochs_stop:
   desc: How many epochs no improvement before early stop
   value: 10
