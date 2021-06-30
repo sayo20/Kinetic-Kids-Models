@@ -2,7 +2,7 @@ from IPython.core.interactiveshell import InteractiveShell
 
 import torch
 from torch import optim, cuda
-
+from torchmetrics import Accuracy
 import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 
@@ -53,7 +53,26 @@ def check_accuracy(loader, model):
             num_samples += predictions.size(0)
         
         print(f'Got {num_correct} / {num_samples} with accuracy {float(num_correct)/float(num_samples)*100:.2f}') 
-    
+   
+def getTop_k(test_loader,model):
+    model.eval()
+    top1 = []
+    top5 = []
+    accuracy1 = Accuracy(top_k=1)
+    accuracy5 = Accuracy(top_k=5
+    with torch.no_grad():
+        for batch_idx, (inputs, targets) in enumerate(test_loader):
+            # measure data loading time
+#             print(f"Processing {batch_idx+1}/{len(test_loader)}")
+            inputs, targets = inputs.cuda(), targets.cuda()
+            inputs, targets = torch.autograd.Variable(inputs, volatile=True), torch.autograd.Variable(targets)
+
+            # compute output
+            outputs = model(inputs)
+            accuracy1(outputs, targets)
+            accuracy5(outputs, targets)
+
+    return accuracy1.compute(),accuracy5.compute() 
 
 def accuracy(output, target,device, topk=(1, )):
     """Compute the topk accuracy(s)"""
