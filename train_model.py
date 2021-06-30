@@ -42,7 +42,7 @@ plt.rcParams['font.size'] = 14
 #custom class
 from dataset import MyDataset
 from slowfastnet import SlowFast,Bottleneck
-from TrainTestCode import train
+from TrainTestCode import train,mapIntToClass,check_accuracy
 
 
 wandb.init(project="kids_model",config='config-default.yaml')
@@ -161,6 +161,8 @@ def accuracy(output, target, topk=(1, )):
         return res
 
 
+#get general accuracy on Test split
+check_accuracy(dataLoader['test'],model)
 # %%
 #get top-1 and top-5 for kids-test data (do for validation and test combined and then only test)
 testiter = iter(dataLoader['test'])
