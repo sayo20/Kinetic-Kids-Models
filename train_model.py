@@ -42,7 +42,7 @@ plt.rcParams['font.size'] = 14
 #custom class
 from dataset import MyDataset
 from slowfastnet import SlowFast,Bottleneck
-from TrainTestCode import train,mapIntToClass,check_accuracy
+from TrainTestCode import train,mapIntToClass,check_accuracy,getTop_k
 
 
 wandb.init(project="kids_model",config='config-default.yaml')
@@ -164,25 +164,28 @@ def accuracy(output, target, topk=(1, )):
 #get general accuracy on Test split
 check_accuracy(dataLoader['test'],model)
 # %%
-#get top-1 and top-5 for kids-test data (do for validation and test combined and then only test)
-testiter = iter(dataLoader['test'])
+#get top-1 and top-5 
+top1,top5 = getTop_k(dataLoader['test'],model)
+print(f'Top-1 accuracy is:{top1} and top-5 is:{top5}')
 
-# Get a batch of testing images and labels
-features, targets = next(testiter)
-print("Top 1 and Top 5 Kids test split")
+# testiter = iter(dataLoader['test'])
 
-accuracy(model(features.to(device)), targets, topk=(1, 5))
+# # Get a batch of testing images and labels
+# features, targets = next(testiter)
+# print("Top 1 and Top 5 Kids test split")
+
+# accuracy(model(features.to(device)), targets, topk=(1, 5))
 
 
 
 # %%
-#get top-1 and top-5 for adults-test data
-testiter = iter(dataLoader['test'])
-# Get a batch of testing images and labels
-features, targets = next(testiter)
-print("Top 1 and Top 5 Adult test split")
+# #get top-1 and top-5 for adults-test data
+# testiter = iter(dataLoader['test'])
+# # Get a batch of testing images and labels
+# features, targets = next(testiter)
+# print("Top 1 and Top 5 Adult test split")
 
-accuracy(model(features.to(device)), targets, topk=(1, 5))
+# accuracy(model(features.to(device)), targets, topk=(1, 5))
 
 
 # %% [markdown]
