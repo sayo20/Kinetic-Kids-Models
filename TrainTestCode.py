@@ -27,7 +27,7 @@ from slowfastnet import SlowFast,Bottleneck
 
 # Printing out all outputs
 InteractiveShell.ast_node_interactivity = 'all'
-
+device='cuda'
 def mapIntToClass(prediction,classjson):
     class_dict = getClassDict(classjson)
     keys_labels = list(class_dict.keys())
