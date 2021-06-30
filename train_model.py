@@ -114,7 +114,7 @@ model = model.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer_ft = optim.Adam(model.fc.parameters(), lr=config['lr'])
 # Decay LR if plateau
-exp_lr_scheduler = lr_scheduler.ReduceLROnPlateau(optimizer_ft, patience=config['patience'], factor=0.5,threshold=0.01)
+exp_lr_scheduler = lr_scheduler.ReduceLROnPlateau(optimizer_ft, patience=config['patience'], factor=0.1,threshold=0.01)
 
 # %% [markdown]
 # # Train Model
@@ -130,7 +130,7 @@ model, history = train(config,
     dataLoader['train'],
     dataLoader['val'],
     exp_lr_scheduler,
-    save_models,device = device,max_epochs_stop=config['max_epochs_stop'],n_epochs = config['epochs'])
+    save_models,device = device,max_epochs_stop=config['max_epochs_stop'],n_epochs = config['epochs'],target_fps=config['target_fps'])
 
 
 torch.save(model.state_dict(),f'model_save/{wandb.run.name}_{age}.pt' )
