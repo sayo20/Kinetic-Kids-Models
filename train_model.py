@@ -130,7 +130,7 @@ model, history = train(config,
     dataLoader['train'],
     dataLoader['val'],
     exp_lr_scheduler,
-    save_models,device = device,max_epochs_stop=config['max_epochs_stop'],n_epochs = config['epochs'],target_fps=config['target_fps'])
+    save_models,device = device,max_epochs_stop=config['max_epochs_stop'],n_epochs = config['epochs'],target_n_frames=config['target_n_frames'])
 
 
 torch.save(model.state_dict(),f'model_save/{wandb.run.name}_{age}.pt' )
