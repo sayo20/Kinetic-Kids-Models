@@ -59,7 +59,7 @@ def getTop_k(test_loader,model):
     top1 = []
     top5 = []
     accuracy1 = Accuracy(top_k=1)
-    accuracy5 = Accuracy(top_k=5
+    accuracy5 = Accuracy(top_k=5)
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(test_loader):
             # measure data loading time

@@ -26,20 +26,19 @@ def changename(csvpath,video_path):
 
 #rename kids
 #train
-changename("Data_Csv/TrainSplit-kids.csv","Kinetic-Kids-processed")
-#test
-changename("Data_Csv/TestSplit-kids.csv","Kinetic-Kids-processed")
-#val
-changename("Data_Csv/ValSplit-kids.csv","Kinetic-Kids-processed")
+changename("data/Data_Csv/TrainSplit-kids.csv","data/Kinetic-Kids-processed")
+#testdata/
+changename("data/Data_Csv/TestSplit-kids.csv","data/Kinetic-Kids-processed")
+#val"data/changename(""data/ata_Csv/ValSplit-kids.csv","Kinetic-Kids-processed")
 #half-train
-changename("Data_Csv/ValSplit-kids_Half.csv","Kinetic-Kids-processed")
+changename("data/Data_Csv/TrainSplit-kids_Half.csv","data/Kinetic-Kids-processed")
 
 #rename adults
 #train
-changename("Data_Csv/TrainSplit-adults.csv","Kinetic-adults-processed")
+changename("data/Data_Csv/TrainSplit-adults.csv","data/Kinetic-adults-processed")
 #test
-changename("Data_Csv/TestSplit-adults.csv","Kinetic-adults-processed")
+changename("data/Data_Csv/TestSplit-adults.csv","data/Kinetic-adults-processed")
 #val
-changename("Data_Csv/ValSplit-adults.csv","Kinetic-adults-processed")
+changename("data/Data_Csv/ValSplit-adults.csv","data/Kinetic-adults-processed")
 #half-train
-changename("Data_Csv/ValSplit-adults_Half.csv","Kinetic-adults-processed")
+changename("data/Data_Csv/TrainSplit-adults_Half.csv","data/Kinetic-adults-processed")

@@ -69,9 +69,9 @@ print(f'Device: {device}')
 # # Create Data Loader for training and test split
 
 # %%
-dataset_train = MyDataset(f'data/Data_Csv/TrainSplit-{age}.csv',f'className_{age}Train.json',mode='train')
-dataset_val = MyDataset(f'data/Data_Csv/ValSplit-{age}.csv',f'className_{age}sVal.json',mode='val')
-dataset_test = MyDataset(f'data/Data_Csv/TestSplit-{age}.csv',f'className_{age}Test.json',mode='test')
+dataset_train = MyDataset(f'data/Data_Csv/TrainSplit-{age}.csv',f'className_{age}Train.json',mode='train',target_n_frames=config['target_n_frames'])
+dataset_val = MyDataset(f'data/Data_Csv/ValSplit-{age}.csv',f'className_{age}sVal.json',mode='val',target_n_frames=config['target_n_frames'])
+dataset_test = MyDataset(f'data/Data_Csv/TestSplit-{age}.csv',f'className_{age}Test.json',mode='test',target_n_frames=config['target_n_frames'])
 dataLoader = {
     'train':DataLoader(dataset_train,batch_size= batch_size,shuffle=True),
     'test': DataLoader(dataset_test,batch_size= batch_size,shuffle=True),
@@ -130,7 +130,7 @@ model, history = train(config,
     dataLoader['train'],
     dataLoader['val'],
     exp_lr_scheduler,
-    save_models,device = device,max_epochs_stop=config['max_epochs_stop'],n_epochs = config['epochs'],target_n_frames=config['target_n_frames'])
+    save_models,device = device,max_epochs_stop=config['max_epochs_stop'],n_epochs = config['epochs'])
 
 
 torch.save(model.state_dict(),f'model_save/{wandb.run.name}_{age}.pt' )
