@@ -107,12 +107,12 @@ class MyDataset(Dataset):
             for i, im in enumerate(vid):
                 frames.append(im)
             pass
-            frames = frames[::2]
-            if len(frames) < 75:
-                    difference = 75 - len(frames)
+            frames = frames[::3]
+            if len(frames) < 40:
+                    difference = 40 - len(frames)
                     frames.extend(frames[-difference:])
 
-            frames = frames[:75]
+            frames = frames[:40]
             
             video = np.stack(frames)
             np.save(path_pt,video)
