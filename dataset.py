@@ -22,8 +22,8 @@ class MyDataset(Dataset):
         val_interval=2,
         input_frame = 64,
         mean=[0.485, 0.456, 0.406],
-        std=[0.229, 0.224, 0.225],mode='train',end_size=[None,256,256],target_fps=40):
-        self.target_fps = target_fps
+        std=[0.229, 0.224, 0.225],mode='train',end_size=[None,256,256],target_n_frames=40):
+        self.target_n_frames = target_n_frames
         self.end_size = end_size
         self.dataset_path = dataset_path
         self.input_frame = input_frame
@@ -95,7 +95,7 @@ class MyDataset(Dataset):
         # print("path is: ",path)
 
         path = os.path.join('data/',row['Video Path'])
-        path_pt = path.split('.')[0] +f"_{self.target_fps}_" +'.npy'
+        path_pt = path.split('.')[0] +f"_{self.target_n_frames}_" +'.npy'
 
         if not os.path.isfile(path_pt):
             vid = skvideo.io.vread(path)
@@ -107,13 +107,13 @@ class MyDataset(Dataset):
             for i, im in enumerate(vid):
                 frames.append(im)
             pass
-            frame_div = len(frames)//self.target_fps
+            frame_div = len(frames)//self.target_n_frames
             frames = frames[::frame_div]
-            if len(frames) < self.target_fps:
-                    difference = self.target_fps - len(frames)
+            if len(frames) < self.target_n_frames:
+                    difference = self.target_n_frames - len(frames)
                     frames.extend(frames[-difference:])
 
-            frames = frames[:self.target_fps]
+            frames = frames[:self.target_n_frames]
             
             video = np.stack(frames)
             np.save(path_pt,video)
