@@ -18,7 +18,7 @@ checkpoint_path:
   value: False
 max_epochs_stop:
   desc: How many epochs no improvement before early stop
-  value: 10
+  value: 12
 target_n_frames:
   desc: N frames target
   value: 40
