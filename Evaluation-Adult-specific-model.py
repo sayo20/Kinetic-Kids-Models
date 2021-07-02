@@ -88,7 +88,7 @@ class UnNormalize(object):
             t.mul_(s).add_(m)
             # The normalize code -> t.sub_(m).div_(s)
         return tensor
-    
+
 def show_img():
     pass
 
@@ -146,19 +146,12 @@ def predict(dataLoader, model, jsonfile):
 
 
 # %%
-#Load model
-#initialize
-# model_ = SlowFast(Bottleneck, [3, 4, 6, 3],num_classes=21)
 
-# #load pre-tained parameter
-# state_dict = torch.load('/Users/feyisayoolalere/Downloads/model_save/curious-firefly-53_adults.pt')
-# model_.load_state_dict(state_dict)
-# model_.eval()
 age = "kids"
-model_name="Adult-SpecificModel"
-# json_file = "className_AdultTest.json"
+model_name="Adult-SpecificModel" #if kids model put name as : Kid-SpecificModel
+
 model = SlowFast(Bottleneck, [3, 4, 6, 3],num_classes=21)
-state_dict = torch.load("model_save\checkpoint_vibrant-waterfall-67_adults.pt",map_location="cuda")#remove map_location on Gpu
+state_dict = torch.load("model_save\checkpoint_vibrant-waterfall-67_adults.pt",map_location="cuda")#change checkpoint
 num_ftrs = model.fc.in_features
 model.fc =  nn.Linear(num_ftrs, 21)
 model.load_state_dict(state_dict)
@@ -167,12 +160,12 @@ model.epoch = 0
 
 
 # %%
-#test adult_finetuned model
+
 
 test = MyDataset(f"data/Data_Csv/TestSplit-{age}.csv",mode='test')
 test_dataloader = DataLoader(test,batch_size= 50,shuffle=True)
 
-adult_test = MyDataset(f"data/Data_Csv/TestSplit-adults.csv",mode='test')#change to kids when running kid-specific model
+
 # predict(test_dataloader_adult, model, "className_AdultTest.json")
 
 
@@ -189,6 +182,20 @@ adult_test = MyDataset(f"data/Data_Csv/TestSplit-adults.csv",mode='test')#change
 # %%
 if torch.cuda.is_available():
     model.cuda()
+
+def plotHeatMap(df_cm,plt):
+    heatmap = sns.heatmap(df_cm, annot=True, fmt="d")
+
+    heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right',fontsize=15)
+    heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=45, ha='right',fontsize=15)
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    heatmap.get_figure().savefig(f"results/{model_name}_{age}.png")
+
+def openJson(age):
+    with open(f'test_len_{age}.json') as json_file:
+        data = json.load(json_file)
+    return data
 
 def run_statistics(loader, model):
     num_correct = 0
@@ -217,176 +224,80 @@ def run_statistics(loader, model):
             accuracy5(scores, y)
 
             #confusion_matrix
-            
+
             for t, p in zip(y.view(-1), predictions.view(-1)):
-                confusion_matrix[t.long(), p.long()] += 1        
+                idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
+                len_dict = openJson(age)
+                label = idx_to_class[t.item()]
+                len_label = len_dict[label]
+                confusion_matrix[t.long(), p.long()] += 1/len_label
 
-        
-        print(f'Got {num_correct} / {num_samples} with accuracy {float(num_correct)/float(num_samples)*100:.2f}') 
+
+        print(f'Got {num_correct} / {num_samples} with accuracy {float(num_correct)/float(num_samples)*100:.2f}')
         print(f'Top-1 accuracy: {accuracy1.compute()}, Top-5 accuracy {accuracy5.compute()}')
+        if model_name =="Adult-SpecificModel" and age == "adults":
+            idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
+            class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
+            plt.figure(figsize=(34,38))
+            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names).astype(int)
+            plotHeatMap(df_cm,plt)
 
-        idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
-        print(idx_to_class)
-        idx_to_class_adult =  {val:key for key,val in adult_test.class_to_idx.items()}
-        plt.figure(figsize=(30,34))
+            #per class accuracy
+            acc_per_class = (confusion_matrix.diag()/confusion_matrix.sum(1))
+            acc_per_class = acc_per_class.tolist()
+            df_acc_per_class = pd.DataFrame({"Class":class_names,"Accuracy":acc_per_class})
+            df_acc_per_class.to_csv(f"results/{model_name}_{age}.csv")
 
-        class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
-        adult_classes = [idx_to_class_adult[x] for x in range(len(idx_to_class_adult))]
-        print("class names: ",class_names)
-        # kids_dict = {key:val.replace('adult','kid') for key,val in idx_to_class.items()}
-        # column_names  = [kids_dict[x] for x in range(len(idx_to_class))]
-        df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=adult_classes).astype(int)
-        heatmap = sns.heatmap(df_cm, annot=True, fmt="d")
+        elif model_name =="Adult-SpecificModel" and age == "kids":
+            adult_test = MyDataset(f"data/Data_Csv/TestSplit-adults.csv",mode='test')#change to kids when running kid-specific model
+            idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
+            idx_to_class_adult =  {val:key for key,val in adult_test.class_to_idx.items()}
 
-        heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right',fontsize=15)
-        heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=45, ha='right',fontsize=15)
-        plt.ylabel('True label')
-        plt.xlabel('Predicted label')
-        heatmap.get_figure().savefig(f"results/{model_name}_{age}.png")
+            class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
+            adult_classes = [idx_to_class_adult[x] for x in range(len(idx_to_class_adult))]
+            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=adult_classes).astype(int)
+            plotHeatMap(df_cm,plt)
+            #per class accuracy
+            acc_per_class = (confusion_matrix.diag()/confusion_matrix.sum(1))
+            acc_per_class = acc_per_class.tolist()
+            df_acc_per_class = pd.DataFrame({"Class":class_names,"Accuracy":acc_per_class})
+            df_acc_per_class.to_csv(f"results/{model_name}_{age}.csv")
 
-        #per class accuracy
+        elif model_name =="Kid-SpecificModel" and age == "kids":
+            idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
+            class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
+            plt.figure(figsize=(34,38))
+            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names).astype(int)
+            plotHeatMap(df_cm,plt)
 
-        acc_per_class = (confusion_matrix.diag()/confusion_matrix.sum(1))
-        acc_per_class = acc_per_class.tolist()
-        df_acc_per_class = pd.DataFrame({"Class":class_names,"Accuracy":acc_per_class})
-        df_acc_per_class.to_csv(f"results/{model_name}_{age}.csv")
-    
-#     model.train()
+            #per class accuracy
+            acc_per_class = (confusion_matrix.diag()/confusion_matrix.sum(1))
+            acc_per_class = acc_per_class.tolist()
+            df_acc_per_class = pd.DataFrame({"Class":class_names,"Accuracy":acc_per_class})
+            df_acc_per_class.to_csv(f"results/{model_name}_{age}.csv")
+        elif model_name =="Kid-SpecificModel" and age == "adults":
+            kids_test = MyDataset(f"data/Data_Csv/TestSplit-kids.csv",mode='test')
+            idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
+            idx_to_class_kid =  {val:key for key,val in kids_test.class_to_idx.items()}
+
+            class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
+            kid_classes = [idx_to_class_kid[x] for x in range(len(idx_to_class_kid))]
+            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=kid_classes).astype(int)
+            plotHeatMap(df_cm,plt)
+
+            #per class accuracy
+
+            acc_per_class = (confusion_matrix.diag()/confusion_matrix.sum(1))
+            acc_per_class = acc_per_class.tolist()
+            df_acc_per_class = pd.DataFrame({"Class":class_names,"Accuracy":acc_per_class})
+            df_acc_per_class.to_csv(f"results/{model_name}_{age}.csv")
+
+        #add mixed model
+
+
 
 
 # %%
 run_statistics(test_dataloader, model)
-
-
-# %%
-
-
-# def getTop_k(test_loader,model):
-#     model.eval()
-#     top1 = []
-#     top5 = []
-#     accuracy1 = Accuracy(top_k=1)
-#     accuracy5 = Accuracy(top_k=5)
-#     with torch.no_grad():
-#         for batch_idx, (inputs, targets) in enumerate(test_loader):
-#             # measure data loading time
-# #             print(f"Processing {batch_idx+1}/{len(test_loader)}")
-#             inputs = inputs.to(device="cuda")
-#             targets = targets.to(device="cuda")
-#             inputs, targets = inputs.cuda(), targets.cuda()
-#             # inputs, targets = torch.autograd.Variable(inputs, volatile=True), torch.autograd.Variable(targets)
-
-#             # compute output
-#             outputs = model(inputs)
-            
-#             accuracy1(outputs, targets)
-#             accuracy5(outputs, targets)
-
-#     return accuracy1.compute(),accuracy5.compute()
-
-
-
-# def getTop_k(test_loader,model):
-#     model.eval()
-#     top1 = []
-#     top5 = []
-#     accuracy1 = Accuracy(top_k=1)
-#     accuracy5 = Accuracy(top_k=5)
-#     with torch.no_grad():
-#         for batch_idx, (inputs, targets) in enumerate(test_loader):
-#             # measure data loading time
-# #             print(f"Processing {batch_idx+1}/{len(test_loader)}")
-            
-#             # inputs, targets = torch.autograd.Variable(inputs, volatile=True), torch.autograd.Variable(targets)
-
-#             # compute output
-#             outputs = model(inputs.cuda()).cpu()
-            
-#             accuracy1(outputs, targets)
-#             accuracy5(outputs, targets)
-
-#     return accuracy1.compute(),accuracy5.compute()
-
-
-# # %%
-# top1,top5 = getTop_k(test_dataloader_adult,model)
-
-
-# # %%
-# print(f'Top-1 accuracy: {top1}, Top-5 accuracy {top5}')
-
-# # %% [markdown]
-# # # create confusion matrix
-
-# # %%
-# """so if the model is kids specific: we calculate accuracy on kids test split and
-# also top1 and top5 on this split but we draw a confusion matrix on the adults test split.
-
-# When its adult specific model we repeat the process.
-# """
-
-
-# # %%
-# def getConfusionMatrix(dataLoader,model):
-#     nb_classes = 21
-#     model.eval()
-#     confusion_matrix = torch.zeros(nb_classes, nb_classes)
-#     with torch.no_grad():
-#         for i, (inputs, classes) in enumerate(dataLoader):
-#             inputs = inputs.to("cuda")
-#             classes = classes.to("cuda")
-#             outputs = model(inputs)
-#             _, preds = torch.max(outputs, 1)
-#             for t, p in zip(classes.view(-1), preds.view(-1)):
-#                 confusion_matrix[t.long(), p.long()] += 1 
-#     return confusion_matrix
-                    
-                    
-    
-
-
-# # %%
-# confusion_matrix = getConfusionMatrix(test_dataloader_adult,model)
-
-
-# # %%
-# #read labels
-# f = open("className_AdultTest.json",)
-# labels = json.load(f)
-# labels
-
-
-# # %%
-# #to plot
-# plt.figure(figsize=(18,22))
-
-# class_names = list(labels.keys())
-# df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names).astype(int)
-# heatmap = sns.heatmap(df_cm, annot=True, fmt="d")
-
-# heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right',fontsize=15)
-# heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=45, ha='right',fontsize=15)
-# plt.ylabel('True label')
-# plt.xlabel('Predicted label')
-# heatmap.get_figure().savefig("Adful-SpecificModel_adult.png")
-
-# # %% [markdown]
-# # # GET ACCURACY PER CLASS
-
-# # %%
-# #To get the per-class accuracy:
-# acc_per_class = (confusion_matrix.diag()/confusion_matrix.sum(1))
-# acc_per_class = acc_per_class.tolist()
-# df_acc_per_class = pd.DataFrame({"Class":labels.keys(),"Accuracy":acc_per_class})
-# df_acc_per_class
-# # print(confusion_matrix.diag()/confusion_matrix.sum(1))
-
-
-# # %%
-# df_acc_per_class
-
-
-# # %%
-
 
 
