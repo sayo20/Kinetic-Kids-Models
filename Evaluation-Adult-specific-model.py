@@ -147,7 +147,7 @@ def predict(dataLoader, model, jsonfile):
 
 # %%
 
-age = "kids"
+age = "adults"
 model_name="Adult-SpecificModel" #if kids model put name as : Kid-SpecificModel
 
 model = SlowFast(Bottleneck, [3, 4, 6, 3],num_classes=21)

@@ -1,0 +1,3 @@
+Model name:Adult-SpecificModel_kids
+Got 161 / 458 with accuracy 35.15Top-1 accuracy: 0.3515283763408661, Top-5 accuracy 0.6965065598487854Model name:Adult-SpecificModel_adults
+Got 334 / 643 with accuracy 51.94Top-1 accuracy: 0.5194401144981384, Top-5 accuracy 0.8195956349372864
