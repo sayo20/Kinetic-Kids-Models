@@ -147,11 +147,11 @@ def predict(dataLoader, model, jsonfile):
 
 # %%
 
-age = "adults"
-model_name="Adult-SpecificModel" #if kids model put name as : Kid-SpecificModel
+age = "kids"
+model_name="Kid-SpecificModel" #if kids model put name as : Kid-SpecificModel
 
 model = SlowFast(Bottleneck, [3, 4, 6, 3],num_classes=21)
-state_dict = torch.load("model_save\checkpoint_vibrant-waterfall-67_adults.pt",map_location="cuda")#change checkpoint
+state_dict = torch.load("model_save\checkpoint_vibrant-dew-70_kids.pt",map_location="cuda")#change checkpoint
 num_ftrs = model.fc.in_features
 model.fc =  nn.Linear(num_ftrs, 21)
 model.load_state_dict(state_dict)
@@ -190,8 +190,6 @@ def run_statistics(loader, model):
     num_correct = 0
     num_samples = 0
     model.eval()
-    top1 = []
-    top5 = []
     accuracy1 = Accuracy(top_k=1)
     accuracy5 = Accuracy(top_k=5)
     nb_classes=21
