@@ -147,6 +147,19 @@ def predict(dataLoader, model, jsonfile):
 
 # %%
 
+settings = [
+    {"model_name":"Adult-SpecificModel", "age":"adults","checkpoint":"model_save\checkpoint_vibrant-waterfall-67_adults.pt","test":"data/Data_Csv/TestSplit-adults.csv"},
+    {"model_name":"Adult-SpecificModel", "age":"kids","checkpoint":"model_save\checkpoint_vibrant-waterfall-67_adults.pt","test":"data/Data_Csv/TestSplit-kids.csv"},
+    {"model_name":"Kid-SpecificModel", "age":"kids","checkpoint":"model_save\checkpoint_vibrant-dew-70_kids.pt","test":"data/Data_Csv/TestSplit-kids.csv"},
+    {"model_name":"Kid-SpecificModel", "age":"adults","checkpoint":"model_save\checkpoint_vibrant-dew-70_kids.pt","test":"data/Data_Csv/TestSplit-adults.csv"},
+    {"model_name":"Mixed Model1", "age":"kids","checkpoint":"model_save\checkpoint dauntless-yogurt-84.pt","test":"data/Data_Csv/TestSplit-kids.csv"},
+    {"model_name":"Mixed Model1", "age":"adults","checkpoint":"model_save\checkpoint dauntless-yogurt-84.pt","test":"data/Data_Csv/TestSplit-adults.csv"},
+    {"model_name":"Mixed Model2", "age":"kids","checkpoint":"","test":"data/Data_Csv/TestSplit-kids.csv"},
+    {"model_name":"Mixed Model2", "age":"adults","checkpoint":"","test":"data/Data_Csv/TestSplit-adults.csv"}
+]
+
+
+
 age = "kids"
 model_name="Kid-SpecificModel" #if kids model put name as : Kid-SpecificModel
 
@@ -166,6 +179,7 @@ test = MyDataset(f"data/Data_Csv/TestSplit-{age}.csv",mode='test')
 test_dataloader = DataLoader(test,batch_size= 50,shuffle=True)
 
 file = open("results/Accuracies.txt", "a")
+
 
 
 # %%
@@ -245,7 +259,7 @@ def run_statistics(loader, model):
             adult_test = MyDataset(f"data/Data_Csv/TestSplit-adults.csv",mode='test')#change to kids when running kid-specific model
             idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
             idx_to_class_adult =  {val:key for key,val in adult_test.class_to_idx.items()}
-            
+
             class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
             plt.figure(figsize=(34,38))
             for ind,class_name in enumerate(class_names):
@@ -296,19 +310,45 @@ def run_statistics(loader, model):
             acc_per_class = acc_per_class.tolist()
             df_acc_per_class = pd.DataFrame({"Class":class_names,"Accuracy":acc_per_class})
             df_acc_per_class.to_csv(f"results/{model_name}_{age}.csv")
-        elif model_name =="Mixed Model":
+
+        elif (model_name =="Mixed Model1" or model_name =="Mixed Model2") and age=="kids":
+            mixed_class = MyDataset(f"data/Data_Csv/train_mixed1.csv",mode='test')
+            idx_to_class_mixed =  {val:key for key,val in mixed_class.class_to_idx.items()}
             idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
+
             class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
+            class_names_mixed = [idx_to_class_mixed[x] for x in range(len(idx_to_class_mixed))]
             plt.figure(figsize=(34,38))
             for ind,class_name in enumerate(class_names):
                 n_class = len_dict[class_name]
                 confusion_matrix[ind,:] /= n_class
             confusion_matrix = (confusion_matrix*100)
-            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names).astype(float)
+            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names_mixed).astype(float)
             plotHeatMap(df_cm)
 
             #per class accuracy
 
+            acc_per_class = (confusion_matrix.diag()/confusion_matrix.sum(1))
+            acc_per_class = acc_per_class.tolist()
+            df_acc_per_class = pd.DataFrame({"Class":class_names,"Accuracy":acc_per_class})
+            df_acc_per_class.to_csv(f"results/{model_name}_{age}.csv")
+
+        elif (model_name =="Mixed Model1" or model_name =="Mixed Model2") and age=="adults":
+            mixed_class = MyDataset(f"data//Data_Csv/train_mixed1.csv",mode='test')
+            idx_to_class_mixed =  {val:key for key,val in mixed_class.class_to_idx.items()}
+            idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
+
+            class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
+            class_names_mixed = [idx_to_class_mixed[x] for x in range(len(idx_to_class_mixed))]
+            plt.figure(figsize=(34,38))
+            for ind,class_name in enumerate(class_names):
+                n_class = len_dict[class_name]
+                confusion_matrix[ind,:] /= n_class
+            confusion_matrix = (confusion_matrix*100)
+            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names_mixed).astype(float)
+            plotHeatMap(df_cm)
+
+            #per class accuracy
             acc_per_class = (confusion_matrix.diag()/confusion_matrix.sum(1))
             acc_per_class = acc_per_class.tolist()
             df_acc_per_class = pd.DataFrame({"Class":class_names,"Accuracy":acc_per_class})
