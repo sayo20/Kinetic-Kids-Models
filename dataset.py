@@ -32,7 +32,7 @@ class MyDataset(Dataset):
         # self.df = self.df[self.df['Action Label']=='hitting baseball_kid']
         self.classes = sorted(self.df["Action Label"].unique()) # List of unique class names
         self.class_to_idx = {j: i for i, j in enumerate(self.classes)}
-
+        
         # with open(json_className, 'w') as fp:
         #     json.dump(self.class_to_idx, fp)
 

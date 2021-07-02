@@ -245,14 +245,14 @@ def run_statistics(loader, model):
             adult_test = MyDataset(f"data/Data_Csv/TestSplit-adults.csv",mode='test')#change to kids when running kid-specific model
             idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
             idx_to_class_adult =  {val:key for key,val in adult_test.class_to_idx.items()}
-
+            
             class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
             plt.figure(figsize=(34,38))
             for ind,class_name in enumerate(class_names):
                 n_class = len_dict[class_name]
                 confusion_matrix[ind,:] /= n_class
             confusion_matrix = (confusion_matrix*100)
-            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names).astype(float)
+            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=sorted(idx_to_class_adult.values())).astype(float)
             plotHeatMap(df_cm)
             #per class accuracy
             acc_per_class = (confusion_matrix.diag()/confusion_matrix.sum(1))
@@ -287,7 +287,7 @@ def run_statistics(loader, model):
                 n_class = len_dict[class_name]
                 confusion_matrix[ind,:] /= n_class
             confusion_matrix = (confusion_matrix*100)
-            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names).astype(float)
+            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=sorted(idx_to_class_kid.values())).astype(float)
             plotHeatMap(df_cm)
 
             #per class accuracy
