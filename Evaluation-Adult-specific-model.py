@@ -165,18 +165,7 @@ model.epoch = 0
 test = MyDataset(f"data/Data_Csv/TestSplit-{age}.csv",mode='test')
 test_dataloader = DataLoader(test,batch_size= 50,shuffle=True)
 
-
-# predict(test_dataloader_adult, model, "className_AdultTest.json")
-
-
-# %%
-# #test HACS
-# hacs_test = MyDataset("/Users/feyisayoolalere/Downloads/HacsSampleTest.csv","className_HacsTest.json",mode='val')
-# test_dataloader_hacs = DataLoader(hacs_test,batch_size= 1,shuffle=True)
-
-
-# predict(test_dataloader_hacs, model, "className_HacsTest.json")
-
+file = open("results/Accuracies.txt", "a")
 
 
 # %%
@@ -227,14 +216,17 @@ def run_statistics(loader, model):
 
             for t, p in zip(y.view(-1), predictions.view(-1)):
                 idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
+
                 len_dict = openJson(age)
                 label = idx_to_class[t.item()]
                 len_label = len_dict[label]
                 confusion_matrix[t.long(), p.long()] += 1/len_label
 
-
+        file.write(f'Model name:{model_name}_{age}\n')
         print(f'Got {num_correct} / {num_samples} with accuracy {float(num_correct)/float(num_samples)*100:.2f}')
+        file.write(f'Got {num_correct} / {num_samples} with accuracy {float(num_correct)/float(num_samples)*100:.2f}')
         print(f'Top-1 accuracy: {accuracy1.compute()}, Top-5 accuracy {accuracy5.compute()}')
+        file.write(f'Top-1 accuracy: {accuracy1.compute()}, Top-5 accuracy {accuracy5.compute()}')
         if model_name =="Adult-SpecificModel" and age == "adults":
             idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
             class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
@@ -291,13 +283,10 @@ def run_statistics(loader, model):
             acc_per_class = acc_per_class.tolist()
             df_acc_per_class = pd.DataFrame({"Class":class_names,"Accuracy":acc_per_class})
             df_acc_per_class.to_csv(f"results/{model_name}_{age}.csv")
-
-        #add mixed model
+    file.close()
 
 
 
 
 # %%
 run_statistics(test_dataloader, model)
-
-
