@@ -17,19 +17,26 @@ def changename(csvpath,video_path):
         new_pth = labels[index]+"/"+file+".mp4"
         src = os.path.join(video_path,old_pth)
         dst = os.path.join(video_path,new_pth)
+        if 'The best Cricket player' in src:
+            print(5)
 
         try:
 #             print(src,dst)
             os.rename(src,dst)
-        except:
+        except FileNotFoundError:
             pass
+        except FileExistsError as e:
+            pass
+        except Exception as e:
+            print(e)
 
 #rename kids
 #train
 changename("data/Data_Csv/TrainSplit-kids.csv","data/Kinetic-Kids-processed")
 #testdata/
 changename("data/Data_Csv/TestSplit-kids.csv","data/Kinetic-Kids-processed")
-#val"data/changename(""data/ata_Csv/ValSplit-kids.csv","Kinetic-Kids-processed")
+#val
+changename("data/Data_Csv/ValSplit-kids.csv","data/Kinetic-Kids-processed")
 #half-train
 changename("data/Data_Csv/TrainSplit-kids_Half.csv","data/Kinetic-Kids-processed")
 
