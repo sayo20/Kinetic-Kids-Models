@@ -215,7 +215,7 @@ def run_statistics(loader, model):
             accuracy5(scores, y)
 
             #confusion_matrix
-            
+
             for t, p in zip(y.view(-1), predictions.view(-1)):
                 label = idx_to_class[t.item()]
                 len_label = len_dict[label]
@@ -283,6 +283,23 @@ def run_statistics(loader, model):
             idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
             idx_to_class_kid =  {val:key for key,val in kids_test.class_to_idx.items()}
 
+            class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
+            plt.figure(figsize=(34,38))
+            for ind,class_name in enumerate(class_names):
+                n_class = len_dict[class_name]
+                confusion_matrix[ind,:] /= n_class
+            confusion_matrix = (confusion_matrix*100)
+            df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names).astype(float)
+            plotHeatMap(df_cm)
+
+            #per class accuracy
+
+            acc_per_class = (confusion_matrix.diag()/confusion_matrix.sum(1))
+            acc_per_class = acc_per_class.tolist()
+            df_acc_per_class = pd.DataFrame({"Class":class_names,"Accuracy":acc_per_class})
+            df_acc_per_class.to_csv(f"results/{model_name}_{age}.csv")
+        elif model_name =="Mixed Model":
+            idx_to_class =  {val:key for key,val in test.class_to_idx.items()}
             class_names = [idx_to_class[x] for x in range(len(idx_to_class))]
             plt.figure(figsize=(34,38))
             for ind,class_name in enumerate(class_names):
