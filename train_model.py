@@ -70,7 +70,7 @@ print(f'Device: {device}')
 
 # %%
 
-train_path = r'data\Data_Csv\train_mixed1.csv'
+train_path = r'data\Data_Csv\train_mixed2.csv'
 val_path = f'data/Data_Csv/val_mixed.csv'
 test_path  = f'data/Data_Csv/test_mixed.csv'
 dataset_train = MyDataset(train_path,mode='train',target_n_frames=config['target_n_frames'])
