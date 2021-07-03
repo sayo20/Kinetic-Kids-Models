@@ -164,10 +164,11 @@ for setting in settings:
     age = setting["age"]
     checkpoint_path = setting['checkpoint']
     model_name = setting['model_name']
-    model_name="Kid-SpecificModel" #if kids model put name as : Kid-SpecificModel
+    test_csv = setting['test']
+#     model_name="Kid-SpecificModel" #if kids model put name as : Kid-SpecificModel
 
     model = SlowFast(Bottleneck, [3, 4, 6, 3],num_classes=21)
-    state_dict = torch.load(model_name,map_location="cuda")#change checkpoint
+    state_dict = torch.load(checkpoint_path,map_location="cuda")#change checkpoint
     num_ftrs = model.fc.in_features
     model.fc =  nn.Linear(num_ftrs, 21)
     model.load_state_dict(state_dict)
@@ -178,7 +179,7 @@ for setting in settings:
     # %%
 
 
-    test = MyDataset(f"data/Data_Csv/TestSplit-{age}.csv",mode='test')
+    test = MyDataset(test_csv,mode='test')
     test_dataloader = DataLoader(test,batch_size= 50,shuffle=True)
 
     file = open("results/Accuracies.txt", "a")
