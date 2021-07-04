@@ -1,0 +1,22 @@
+,Class,Accuracy
+0,archery_kid,0.8999999761581421
+1,bouncing on trampoline_kid,0.7540984153747559
+2,bowling_kid,0.6000000238418579
+3,cartwheeling_kid,0.35483869910240173
+4,catching or throwing baseball_kid,0.3571428060531616
+5,catching or throwing frisbee_kid,0.3333333134651184
+6,catching or throwing softball_kid,0.0833333283662796
+7,dribbling basketball_kid,0.357142835855484
+8,dunking basketball_kid,0.22727273404598236
+9,hitting baseball_kid,0.34375
+10,juggling soccer ball_kid,0.5862069129943848
+11,kicking soccer ball_kid,0.31578946113586426
+12,parkour_kid,0.25
+13,playing badminton_kid,0.5
+14,playing basketball_kid,0.15384617447853088
+15,playing cricket_kid,0.3928571343421936
+16,playing tennis_kid,0.699999988079071
+17,playing volleyball_kid,0.2666666805744171
+18,shooting basketball_kid,0.222222238779068
+19,somersaulting_kid,0.5744680166244507
+20,water skiing_kid,1.0

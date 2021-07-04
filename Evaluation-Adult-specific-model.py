@@ -152,10 +152,10 @@ settings = [
     {"model_name":"Adult-SpecificModel", "age":"kids","checkpoint":"model_save\checkpoint_vibrant-waterfall-67_adults.pt","test":"data/Data_Csv/TestSplit-kids.csv"},
     {"model_name":"Kid-SpecificModel", "age":"kids","checkpoint":"model_save\checkpoint_vibrant-dew-70_kids.pt","test":"data/Data_Csv/TestSplit-kids.csv"},
     {"model_name":"Kid-SpecificModel", "age":"adults","checkpoint":"model_save\checkpoint_vibrant-dew-70_kids.pt","test":"data/Data_Csv/TestSplit-adults.csv"},
-    {"model_name":"Mixed Model1", "age":"kids","checkpoint":"model_save\checkpoint dauntless-yogurt-84.pt","test":"data/Data_Csv/TestSplit-kids.csv"},
-    {"model_name":"Mixed Model1", "age":"adults","checkpoint":"model_save\checkpoint dauntless-yogurt-84.pt","test":"data/Data_Csv/TestSplit-adults.csv"},
-    {"model_name":"Mixed Model2", "age":"kids","checkpoint":"model_save\checkpoint genial-deluge-88.pt","test":"data/Data_Csv/TestSplit-kids.csv"},
-    {"model_name":"Mixed Model2", "age":"adults","checkpoint":"model_save\checkpoint genial-deluge-88.pt","test":"data/Data_Csv/TestSplit-adults.csv"}
+    {"model_name":"Mixed Model1", "age":"kids","checkpoint":"model_save\checkpoint_dauntless-yogurt-84_kids.pt","test":"data/Data_Csv/TestSplit-kids.csv"},
+    {"model_name":"Mixed Model1", "age":"adults","checkpoint":"model_save\checkpoint_dauntless-yogurt-84_kids.pt","test":"data/Data_Csv/TestSplit-adults.csv"},
+    {"model_name":"Mixed Model2", "age":"kids","checkpoint":"model_save\checkpoint_genial-deluge-88_kids.pt","test":"data/Data_Csv/TestSplit-kids.csv"},
+    {"model_name":"Mixed Model2", "age":"adults","checkpoint":"model_save\checkpoint_genial-deluge-88_kids.pt","test":"data/Data_Csv/TestSplit-adults.csv"}
 ]
 
 for setting in settings:

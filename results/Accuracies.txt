@@ -4,15 +4,21 @@ Top-1 accuracy: 0.5194401144981384, Top-5 accuracy 0.8195956349372864
 Model name:Adult-SpecificModel_kids
 Got 161 / 458 with accuracy 35.15
 Top-1 accuracy: 0.3515283763408661, Top-5 accuracy 0.6965065598487854
-Model name:Adult-SpecificModel_kids
-Got 201 / 458 with accuracy 43.89
-Top-1 accuracy: 0.4388646185398102, Top-5 accuracy 0.7816593647003174
-Model name:Adult-SpecificModel_adults
-Got 334 / 643 with accuracy 51.94
-Top-1 accuracy: 0.5194401144981384, Top-5 accuracy 0.8195956349372864
-Model name:Kid-SpecificModel_adults
-Got 293 / 643 with accuracy 45.57
-Top-1 accuracy: 0.45567652583122253, Top-5 accuracy 0.7620528936386108
 Model name:Kid-SpecificModel_kids
 Got 201 / 458 with accuracy 43.89
 Top-1 accuracy: 0.4388646185398102, Top-5 accuracy 0.7816593647003174
+Model name:Kid-SpecificModel_adults
+Got 293 / 643 with accuracy 45.57
+Top-1 accuracy: 0.45567652583122253, Top-5 accuracy 0.7620528936386108
+Model name:Mixed Model1_kids
+Got 201 / 458 with accuracy 43.89
+Top-1 accuracy: 0.4388646185398102, Top-5 accuracy 0.7467249035835266
+Model name:Mixed Model1_adults
+Got 329 / 643 with accuracy 51.17
+Top-1 accuracy: 0.511664092540741, Top-5 accuracy 0.8180404305458069
+Model name:Mixed Model2_kids
+Got 212 / 458 with accuracy 46.29
+Top-1 accuracy: 0.4628821015357971, Top-5 accuracy 0.7860261797904968
+Model name:Mixed Model2_adults
+Got 338 / 643 with accuracy 52.57
+Top-1 accuracy: 0.5256609916687012, Top-5 accuracy 0.8522550463676453
